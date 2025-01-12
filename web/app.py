@@ -1,9 +1,9 @@
 # web/app.py
 
+import os
 from flask import Flask, render_template, request, jsonify
 from core.whisper_model import WhisperModel
 from core.audio_utils import convert_audio_to_wav
-import os
 
 app = Flask(__name__)
 model = WhisperModel()
@@ -20,6 +20,11 @@ def upload_audio():
     file = request.files["file"]
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
+
+    # اعتبارسنجی فرمت فایل
+    allowed_extensions = {"ogg", "wav", "mp3"}
+    if not file.filename.lower().endswith(tuple(allowed_extensions)):
+        return jsonify({"error": "Invalid file format"}), 400
 
     input_path = "uploaded_audio.ogg"
     output_path = "uploaded_audio.wav"
